@@ -102,3 +102,19 @@ ggplot(output, aes(y = row, x = col)) +
 
 
 ```
+
+## Example student plotting code
+
+```{r, eval = FALSE, warning=FALSE,message=FALSE}
+library(ggplot2)
+## one tomato type
+ggplot(data = data, aes(x = treatment, y = fruit_dry_weight)) +
+  geom_violin() + geom_dotplot(binaxis = "y", method = "histodot") +
+  theme_bw() + xlab("Fertilizer Recipie") + ylab("Fruit Dry Weight (g/m^2)")
+## two tomato types
+ggplot(data = data, aes(x = treatment, y = fruit_dry_weight)) +
+  geom_violin() + geom_dotplot(binaxis = "y", method = "histodot") +
+  theme_bw() + xlab("Fertilizer Recipie") + ylab("Fruit Dry Weight (g/m^2)") +
+  facet_wrap(~species)
+
+```

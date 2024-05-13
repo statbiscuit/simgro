@@ -80,13 +80,26 @@ coefficients of growth equations)
     head(output)
 
     ##   row col total_plant_weight fruit_dry_weight mature_fruit_weight
-    ## 1   1   1          0.8716994       0.10164215          0.31634842
-    ## 2   2   1          1.9455343       0.05915287          0.15458931
-    ## 3   3   1          2.3353738       0.06525279          0.13140902
-    ## 4   4   1          2.0078426       0.05994222          0.13059275
-    ## 6   6   1          1.9438241       0.02988962          0.06093980
-    ## 7   7   1          1.8961110       0.02949877          0.04854871
+    ## 1   1   1           709.1281         36.28879            29.44600
+    ## 2   2   1           716.5291         34.49983            27.72386
+    ## 3   3   1           728.4007         31.42083            24.86855
+    ## 4   4   1           769.2192         29.88152            22.74574
+    ## 6   6   1           838.5590         26.38313            18.59797
+    ## 7   7   1           828.4996         23.05504            15.53268
 
 #### Illustration of output
 
 ![](README_files/figure-markdown_strict/unnamed-chunk-4-1.png)
+
+## Example student plotting code
+
+    library(ggplot2)
+    ## one tomato type
+    ggplot(data = data, aes(x = treatment, y = fruit_dry_weight)) +
+      geom_violin() + geom_dotplot(binaxis = "y", method = "histodot") +
+      theme_bw() + xlab("Fertilizer Recipie") + ylab("Fruit Dry Weight (g/m^2)")
+    ## two tomato types
+    ggplot(data = data, aes(x = treatment, y = fruit_dry_weight)) +
+      geom_violin() + geom_dotplot(binaxis = "y", method = "histodot") +
+      theme_bw() + xlab("Fertilizer Recipie") + ylab("Fruit Dry Weight (g/m^2)") +
+      facet_wrap(~species)

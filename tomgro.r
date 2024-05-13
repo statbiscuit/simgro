@@ -7,8 +7,16 @@
 #' @param nmax maximum rate of node initiation, defaut 0.5
 node_init_rate <- function(T = 15, nmax = 0.5){
     ## reduce rate of node initiation when T is outside the optimum range
-    ## Table 3, Jones 1991
-    fn = ifelse(T < 12 | T >=50, 0, ifelse(T < 28, 0.55, 1))
+    fn <- numeric(length(T))
+    for(i in 1:length(fn)){
+        if (T[i] > 12 & T[i] <= 28) {
+            fn[i] <- 1.0 + 0.0281 * (T[i] - 28)
+        } else if (T[i] > 28 & T[i] < 50) {
+            fn[i] <- 1.0 - 0.0455 * (T[i] - 28)
+        } else {
+            fn[i] <- 0
+        }
+    }
     ## rate of node initiation per plant
     return(nmax*fn)
 }
@@ -59,18 +67,16 @@ leaf_area_development_rate <- function(LAI = leaf_area_index(), n = 3, plant_den
 #' @param C02 carbon dioxide (ppm), default 350
 #' @param PPFD photosynthetic photon flux density (~light intensity), default 180
 #' @inheritParams leaf_area_development_rate
-biomass_growth_rate <- function(params =  c("E" = 0.1717, "Q10" = 1.4, "rm" = 0.016,
-                                            "D" = 2.593, "K" = 0.58, "m" = 0.1, "Qe" = 0.0645, "tau" = 0.063),
+biomass_growth_rate <- function(params =  c("E" = 0.717, "Q10" = 1.4, "rm" = 0.016,
+                                            "D" = 2.593, "K" = 0.58, "m" = 0.1, "Qe" = 0.0645, "tau" = 0.0693),
                                 W = 21.8, Wm = 0, n = 3, T = 15, C02 = 350, LAI = 0.2, PPFD  = 180){
     ##  fraction carbs partitioned to roots 
-    proot <- ifelse(n >= 30, 0.07, ifelse(n < 1, 0,
-                                   ifelse(n < 12, 0.2, ifelse(n <- 21, 0.15, ifelse(n < 30, 0.1,0)))))
-   
+    proot <- ifelse(n >= 30, 0.07, -0.0046 * n + 0.2034)
     ## maximum leaf photosyntehstic rate, EQ 17 Jones 1991
     lfmax <- params[["tau"]]*C02
     ## reduce photosynthetic rate for temps outside optimal range
     ## Table 3, Jones 1991
-    pgred <- ifelse(T < 9 | T >= 35, 0, ifelse(T < 12, 0.67, 1))
+    pgred <- ifelse(T < 12 | T >= 35, 0, ifelse(T < 12, 1/12*T, 1))
     ## daily integral of gross photosynthesis
     ## Eq 16 Jones 1991
     pg1 <- (params[["D"]] * lfmax * pgred / params[["K"]])
@@ -87,23 +93,23 @@ biomass_growth_rate <- function(params =  c("E" = 0.1717, "Q10" = 1.4, "rm" = 0.
 }
 #' Calculates the rate of fruit dry matter
 #' Eq 7 Jones 1999 "DWf/dt"
-#' @param nodes_pp the number of nodes per plant when first fruit appears, default 12
+#' @param nodes_pp the number of nodes per plant when first fruit appears, default 22
 #' @param params_02 a vector of parameters/coefficiens in
 #' Jones' 1999 Eq 7, default c("alpha" = 0.8, "nu" = 0.35)
 #' @param tcrit  mean daytime temperature above which fruit abortion start, default 24.4
 #' @param tday average daytime temperature, default = 20
 #' @inheritParams biomass_growth_rate
-fruit_dry_matter_rate <- function( T = 15, nodes_pp = 12, bgr = biomass_growth_rate(),
+fruit_dry_matter_rate <- function( T = 15, nodes_pp = 22, bgr = biomass_growth_rate(),
                                   tcrit = 24.4, tday = 20, n = 30,
                                   params_02 = c("alpha" = 0.8, "nu" = 0.135)){
     ## net aboveground biomas growthrate (g/(m2 d)) Eq 5 Jones 1999
     grnet <- bgr
     ## overall rate of development (per day) of fruit under current T
     ## Table 3, Jones 1991
-    rf <- ifelse(T < 9 | T >=50, 0, ifelse(T <15 , 0.0053, ifelse(T < 21, 0.0103, ifelse(T < 28, 0.0203, 0.032))))
+    rf <-  ifelse(T > 8 | T <= 28, 0.0017 * T - 0.0147, ifelse(T > 28, 0.032, 0))
     ## function to modify fruit under hot daytime conditions
     ## Eq 8 Jones 1999
-    gtday <- ifelse(tday > tcrit, 1 - 0.154*(tday - tcrit), 1)
+    gtday <- ifelse(tday < tcrit, 1 - 0.154*(tday - tcrit), 0)
     ## Eq 7 Jones 1999
     res <- ifelse(n > nodes_pp, grnet*params_02[["alpha"]]*rf *(1 - exp(-params_02[["nu"]]*(n - nodes_pp)))*gtday,
                   0)
@@ -137,7 +143,7 @@ above_biomass_accumulation <- function(nir = node_init_rate(),
 mature_fruit_accumulation <- function(n = 3, T = 15, nodes_pp = 22, kappa = 5, Wf = 0 , Wm = 0){
     ## overall rate of development (per day) of fruit under current T
     ## Table 3, Jones 1991
-    rf <- ifelse(T < 9 | T >=50, 0, ifelse(T <15 , 0.0053, ifelse(T < 21, 0.0103, ifelse(T < 28, 0.0203, 0.032))))
+    rf <-  ifelse(T > 9 | T <= 28, 0.0017 * T - 0.015, ifelse(T > 28 & T < 35, 0.032, 0))
     res <- ifelse(n > nodes_pp + kappa, rf *(Wf - Wm), 0)
     return(res)
 }
@@ -151,20 +157,34 @@ mature_fruit_accumulation <- function(n = 3, T = 15, nodes_pp = 22, kappa = 5, W
 #' @param T average daily temperature
 #' @param PPFD average daily PPFD value
 grow <- function(T, PPFD){
-    nodes <- node_init_rate(T)
-    lai <- leaf_area_index(n = cumsum(nodes))
-    ##dLAI/dt
-    dlai <- leaf_area_development_rate(LAI = lai, n = cumsum(nodes), nir = nodes)
-    ## Grnet
-    bgr <- biomass_growth_rate(T = T, PPFD = PPFD, LAI = cumsum(lai) , n = cumsum(nodes))
-    ## Dwf/dt
-    fdr <- fruit_dry_matter_rate(T = T, bgr = bgr, n = cumsum(nodes))
-    ## DWdt
-    aba <- above_biomass_accumulation(LAI = cumsum(lai),
-                                      nir = nodes, bgr = bgr,
-                                      fdr = fdr)
-    ## DWmdt
-    mfa <- mature_fruit_accumulation(T = T, n = cumsum(nodes), Wf = cumsum(fdr))
+    ## initial starting values
+    Ws <- Wfs <- Wms <- numeric(length(T))
+    N <- 6.0
+    LAI <- 0.006
+    W <- Wf <- Wm  <- 0
+    for(j in 1:length(T)){
+        dndt <-  node_init_rate(T[j])
+        dlaidt <- leaf_area_development_rate(LAI = LAI,
+                                             plant_density = 3.1,
+                                             n = N, nir = dndt)
+        bgr <- biomass_growth_rate(T = T[j], PPFD = PPFD[j],
+                                   LAI = LAI , n = N, W = W, Wm = Wm)
+        dWfdt <- fruit_dry_matter_rate(T = T[j], bgr = bgr, n = N)
+        dWdt <- above_biomass_accumulation(LAI = LAI, bgr = bgr,
+                                           nir = dndt, fdr = dWfdt)
+        dWmdt <- mature_fruit_accumulation(n = N, T = T[j],
+                                           Wf = Wf, Wm = Wm)
+        ## Update
+        N <- N + dndt
+        LAI <- LAI +  dlaidt
+        W <- W + dWdt
+        Wf <- Wf + dWfdt
+        Wm <- Wm + dWmdt
+        ## output
+        Ws[j] <- W
+        Wfs[j] <- Wf
+        Wms[j] <- Wm
+    }
     n <- length(T) ## last day
-    return(cbind(aba[n], fdr[n], mfa[n]))
+    return(cbind(Ws[n], Wfs[n], Wms[n]))
 }
