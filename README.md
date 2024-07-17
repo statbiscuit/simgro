@@ -39,191 +39,119 @@ photosynthetic photon flux density, PPFD (light intensity),
     plant_type
 
     ##      [,1]       [,2]       [,3]       [,4]   [,5]       [,6]       [,7]      
-    ## [1,] "heirloom" "cherry"   "cherry"   "path" "cherry"   "heirloom" "cherry"  
-    ## [2,] "heirloom" "heirloom" "cherry"   "path" "heirloom" "cherry"   "heirloom"
-    ## [3,] "heirloom" "cherry"   "cherry"   "path" "heirloom" "heirloom" "heirloom"
+    ## [1,] "cherry"   "heirloom" "cherry"   "path" "cherry"   "heirloom" "heirloom"
+    ## [2,] "heirloom" "cherry"   "heirloom" "path" "heirloom" "cherry"   "heirloom"
+    ## [3,] "cherry"   "cherry"   "cherry"   "path" "heirloom" "cherry"   "heirloom"
     ## [4,] "cherry"   "heirloom" "cherry"   "path" "path"     "path"     "path"    
-    ## [5,] "path"     "path"     "path"     "path" "heirloom" "heirloom" "cherry"  
-    ## [6,] "cherry"   "cherry"   "heirloom" "path" "cherry"   "heirloom" "heirloom"
-    ## [7,] "cherry"   "heirloom" "cherry"   "path" "cherry"   "heirloom" "heirloom"
+    ## [5,] "path"     "path"     "path"     "path" "heirloom" "heirloom" "heirloom"
+    ## [6,] "cherry"   "cherry"   "heirloom" "path" "heirloom" "heirloom" "cherry"  
+    ## [7,] "cherry"   "heirloom" "heirloom" "path" "heirloom" "cherry"   "heirloom"
 
     percent_manure[idx] <- NA
     percent_manure
 
     ##      [,1] [,2] [,3] [,4] [,5] [,6] [,7]
-    ## [1,]   30   10   10   NA   30   80   10
-    ## [2,]   10   80   10   NA    0   80   30
-    ## [3,]   50   10    0   NA   10   80   30
-    ## [4,]   10   50   30   NA   NA   NA   NA
-    ## [5,]   NA   NA   NA   NA   30   10   10
-    ## [6,]   80   30   10   NA   80   30   80
-    ## [7,]   80   30    0   NA   10   50   30
+    ## [1,]   50   10   10   NA   50   80   30
+    ## [2,]   50    0   10   NA   50   10   10
+    ## [3,]    0    0   50   NA   50   50   10
+    ## [4,]   30   30   10   NA   NA   NA   NA
+    ## [5,]   NA   NA   NA   NA   50   50    0
+    ## [6,]   30    0   30   NA   10   10    0
+    ## [7,]   30   30   30   NA   30   50   30
 
 ### Simulation
 
     ## map recipe names to % values
     recipes <- c("Control" = 0, "Recipe 1" = 10, "Recipe 2" = 30, "Recipe 3" = 50, "Recipe 4" = 80)
-    results <- tomgro(plant_type = plant_type, percent_manure = percent_manure, recipes = recipes, prob_die = c(0.1, 0.5))
+    results <- tomgro(plant_type = plant_type, percent_manure = percent_manure, recipes = recipes, prob_die = c(0.5, 0.1))
     results
 
     ##    row col    plant   recipe percent_manure survived total_plant_weight
-    ## 1    1   1 heirloom Recipe 2             30      yes           849.1212
-    ## 2    2   1 heirloom Recipe 1             10      yes           845.4350
-    ## 3    3   1 heirloom Recipe 3             50      yes           894.2007
-    ## 4    4   1   cherry Recipe 1             10      yes           968.7056
-    ## 6    6   1   cherry Recipe 4             80      yes          1001.6359
-    ## 7    7   1   cherry Recipe 4             80      yes           931.8668
-    ## 8    1   2   cherry Recipe 1             10      yes           973.0764
-    ## 9    2   2 heirloom Recipe 4             80      yes           912.0706
-    ## 10   3   2   cherry Recipe 1             10       no                 NA
-    ## 11   4   2 heirloom Recipe 3             50      yes           957.3382
-    ## 13   6   2   cherry Recipe 2             30      yes          1022.5205
-    ## 14   7   2 heirloom Recipe 2             30      yes           860.1848
-    ## 15   1   3   cherry Recipe 1             10      yes           993.0728
-    ## 16   2   3   cherry Recipe 1             10      yes          1039.7724
-    ## 17   3   3   cherry  Control              0      yes           598.7451
-    ## 18   4   3   cherry Recipe 2             30      yes          1076.5858
-    ## 20   6   3 heirloom Recipe 1             10      yes           910.6792
-    ## 21   7   3   cherry  Control              0      yes           593.2357
-    ## 29   1   5   cherry Recipe 2             30      yes          1190.9471
-    ## 30   2   5 heirloom  Control              0      yes           576.5829
-    ## 31   3   5 heirloom Recipe 1             10      yes          1015.2409
-    ## 33   5   5 heirloom Recipe 2             30      yes           993.1862
-    ## 34   6   5   cherry Recipe 4             80      yes          1059.3804
-    ## 35   7   5   cherry Recipe 1             10      yes           941.9839
-    ## 36   1   6 heirloom Recipe 4             80      yes          1079.0536
-    ## 37   2   6   cherry Recipe 4             80      yes          1192.7299
-    ## 38   3   6 heirloom Recipe 4             80      yes          1047.0076
-    ## 40   5   6 heirloom Recipe 1             10      yes           978.1433
-    ## 41   6   6 heirloom Recipe 2             30       no                 NA
-    ## 42   7   6 heirloom Recipe 3             50      yes           934.3269
-    ## 43   1   7   cherry Recipe 1             10      yes          1096.1904
-    ## 44   2   7 heirloom Recipe 2             30      yes          1120.6759
-    ## 45   3   7 heirloom Recipe 2             30      yes          1094.9508
-    ## 47   5   7   cherry Recipe 1             10      yes          1039.1453
-    ## 48   6   7 heirloom Recipe 4             80      yes           963.5239
-    ## 49   7   7 heirloom Recipe 2             30      yes           948.7971
+    ## 1    1   1   cherry Recipe 3             50      yes           995.5682
+    ## 2    2   1 heirloom Recipe 3             50      yes           903.4194
+    ## 3    3   1   cherry  Control              0      yes           538.4664
+    ## 4    4   1   cherry Recipe 2             30       no                 NA
+    ## 6    6   1   cherry Recipe 2             30      yes           998.1276
+    ## 7    7   1   cherry Recipe 2             30      yes           956.9588
+    ## 8    1   2 heirloom Recipe 1             10      yes           937.2231
+    ## 9    2   2   cherry  Control              0      yes           551.5070
+    ## 10   3   2   cherry  Control              0      yes           572.7392
+    ## 11   4   2 heirloom Recipe 2             30      yes           958.0587
+    ## 13   6   2   cherry  Control              0      yes           573.6247
+    ## 14   7   2 heirloom Recipe 2             30      yes           874.7913
+    ## 15   1   3   cherry Recipe 1             10      yes          1013.6759
+    ## 16   2   3 heirloom Recipe 1             10      yes           968.9352
+    ## 17   3   3   cherry Recipe 3             50      yes          1133.3246
+    ## 18   4   3   cherry Recipe 1             10      yes          1012.7984
+    ## 20   6   3 heirloom Recipe 2             30      yes           924.0238
+    ## 21   7   3 heirloom Recipe 2             30      yes           891.2345
+    ## 29   1   5   cherry Recipe 3             50      yes          1192.4722
+    ## 30   2   5 heirloom Recipe 3             50      yes          1072.9738
+    ## 31   3   5 heirloom Recipe 3             50      yes          1043.8377
+    ## 33   5   5 heirloom Recipe 3             50      yes           986.4382
+    ## 34   6   5 heirloom Recipe 1             10      yes           933.4310
+    ## 35   7   5 heirloom Recipe 2             30      yes           922.2049
+    ## 36   1   6 heirloom Recipe 4             80      yes          1082.9002
+    ## 37   2   6   cherry Recipe 1             10      yes          1103.6743
+    ## 38   3   6   cherry Recipe 3             50      yes          1228.6184
+    ## 40   5   6 heirloom Recipe 3             50      yes          1008.8420
+    ## 41   6   6 heirloom Recipe 1             10      yes           941.2707
+    ## 42   7   6   cherry Recipe 3             50      yes          1067.5934
+    ## 43   1   7 heirloom Recipe 2             30      yes          1136.0658
+    ## 44   2   7 heirloom Recipe 1             10      yes          1087.4237
+    ## 45   3   7 heirloom Recipe 1             10      yes          1071.6786
+    ## 47   5   7 heirloom  Control              0      yes           590.6623
+    ## 48   6   7   cherry  Control              0      yes           716.3239
+    ## 49   7   7 heirloom Recipe 2             30      yes           942.6767
     ##    fruit_dry_weight mature_fruit_weight
-    ## 1          46.19069           23.159258
-    ## 2          33.04024           16.816265
-    ## 3          44.33791           19.933408
-    ## 4          50.36874           26.428716
-    ## 6          79.90003           35.894522
-    ## 7          75.59620           30.993705
-    ## 8          55.96686           33.855208
-    ## 9          45.31739           21.315009
-    ## 10               NA                  NA
-    ## 11         46.22767           17.888410
-    ## 13        101.73324           46.475272
-    ## 14         37.44542            9.819733
-    ## 15         63.02665           39.762609
-    ## 16         66.11574           38.580667
-    ## 17         19.17483            9.834894
-    ## 18        117.39701           59.131289
-    ## 20         42.91232           13.101518
-    ## 21         12.48866            4.929454
-    ## 29        150.31819           90.087236
-    ## 30         15.13464            6.442484
-    ## 31         61.29451           25.466821
-    ## 33         65.05005           23.130959
-    ## 34        133.33237           57.051296
-    ## 35         70.65914           28.358498
-    ## 36         67.34472           32.235230
-    ## 37        161.45473           90.569600
-    ## 38         69.45904           27.040687
-    ## 40         60.15297           20.646578
-    ## 41               NA                  NA
-    ## 42         58.76525           15.575122
-    ## 43        102.46430           60.934165
-    ## 44         96.14450           42.824104
-    ## 45         93.72086           38.064710
-    ## 47         94.41022           45.102237
-    ## 48         64.00961           18.862558
-    ## 49         64.99651           18.389947
+    ## 1         110.48163           66.920405
+    ## 2          45.71853           22.196835
+    ## 3          17.04476            8.741088
+    ## 4                NA                  NA
+    ## 6          87.55002           38.453247
+    ## 7          80.65550           33.116330
+    ## 8          42.97242           20.272389
+    ## 9          18.94464           10.233477
+    ## 10         18.10401            9.214667
+    ## 11         56.96950           22.163610
+    ## 13         13.30925            5.538225
+    ## 14         39.10241           11.440313
+    ## 15         67.05777           42.040903
+    ## 16         51.44203           23.254537
+    ## 17        132.06758           74.868811
+    ## 18         61.22137           30.831241
+    ## 20         50.11726           15.066437
+    ## 21         48.77732           13.853840
+    ## 29        162.26126          101.696335
+    ## 30         72.48344           33.701949
+    ## 31         73.23010           31.410485
+    ## 33         64.60831           21.723774
+    ## 34         48.30314           14.705727
+    ## 35         55.57666           15.033670
+    ## 36         70.44830           33.254693
+    ## 37         95.22847           52.869050
+    ## 38        209.55643          112.131469
+    ## 40         81.52740           26.696968
+    ## 41         54.18249           16.971873
+    ## 42        169.54895           68.065547
+    ## 43        104.92108           46.678416
+    ## 44         81.91799           36.335491
+    ## 45         78.09450           31.883636
+    ## 47         11.29059            3.751373
+    ## 48         17.49551            7.499321
+    ## 49         68.19990           18.749250
 
 ### The ‘TRUE’ effect of manure
 
 <img src="README_files/figure-markdown_strict/unnamed-chunk-3-1.png" width="100%" />
 
-## Further examples & student plotting code
+## Student plotting code
 
-### Just 30 Cherry seedlings
-
-    ## Just 30 Cherry tomato seedlings
-    ## setting up data
-    plant_type <- matrix(rep("cherry", 49), nrow = 7) 
-    percent_manure <- matrix(sample(c(0, 10, 30, 50, 80), replace = TRUE, size = 49), nrow = 7)
-    ## path index
-    idx <- cbind(c(5, 5, 5, 4, 4, 4,1:7), c(1:3, 5:7, rep(4,7)))
-    ## six missing planters
-    idx_empty <- cbind(c(1:3, 5:7), c(1:3, rep(7, 3)))
-    plant_type[idx] <-  "path"
-    plant_type[idx_empty] <-  "empty"
-    percent_manure[rbind(idx, idx_empty)] <- NA
-    recipes <- c("Control" = 0, "Recipe 1" = 10, "Recipe 2" = 30, "Recipe 3" = 50, "Recipe 4" = 80)
-    results <- tomgro(plant_type = plant_type, percent_manure = percent_manure, recipes = recipes, prob_die = c(0.1, 0.5))
-
-    ##plotting code for students
+    ## sample plotting code for students
     library(ggplot2)
     ggplot(data = results, aes(x = recipe, y = fruit_dry_weight)) +
-      geom_violin() + geom_dotplot(binaxis = "y", method = "histodot") +
-      theme_bw() + xlab("Fertilizer Recipie") + ylab("Fruit Dry Weight (g/m^2)")
-
-<img src="README_files/figure-markdown_strict/unnamed-chunk-5-1.png" width="100%" />
-
-    ggplot(data = results, aes(x = recipe, y = mature_fruit_weight)) +
-      geom_violin() + geom_dotplot(binaxis = "y", method = "histodot") +
-      theme_bw() + xlab("Fertilizer Recipie") + ylab("Mature Fruit Weight (g/m^2)")
-
-<img src="README_files/figure-markdown_strict/unnamed-chunk-5-2.png" width="100%" />
-
-### Just 30 Heirloom seedings
-
-    ## Just 30 Cherry tomato seedlings
-    ## setting up data
-    plant_type <- matrix(rep("heirloom", 49), nrow = 7) 
-    percent_manure <- matrix(sample(c(0, 10, 30, 60, 80), replace = TRUE, size = 49), nrow = 7)
-    ## path index
-    idx <- cbind(c(5, 5, 5, 4, 4, 4,1:7), c(1:3, 5:7, rep(4,7)))
-    ## six missing planters
-    idx_empty <- cbind(c(1:3, 5:7), c(1:3, rep(7, 3)))
-    plant_type[idx] <-  "path"
-    plant_type[idx_empty] <-  "empty"
-    percent_manure[rbind(idx, idx_empty)] <- NA
-    recipes <- c("Control" = 0, "Recipe 1" = 10, "Recipe 2" = 30, "Recipe 3" = 60, "Recipe 4" = 80)
-    results <- tomgro(plant_type = plant_type, percent_manure = percent_manure, recipes = recipes, prob_die = c(0.1, 0.5))
-
-    ## plotting code for students
-    library(ggplot2)
-    ## one tomato type
-    ggplot(data = results, aes(x = recipe, y = fruit_dry_weight)) +
-      geom_violin() + geom_dotplot(binaxis = "y", method = "histodot") +
-      theme_bw() + xlab("Fertilizer Recipie") + ylab("Fruit Dry Weight (g/m^2)")
-
-<img src="README_files/figure-markdown_strict/unnamed-chunk-7-1.png" width="100%" />
-
-    ggplot(data = results, aes(x = recipe, y = mature_fruit_weight)) +
-      geom_violin() + geom_dotplot(binaxis = "y", method = "histodot") +
-      theme_bw() + xlab("Fertilizer Recipie") + ylab("Mature Fruit Weight (g/m^2)")
-
-<img src="README_files/figure-markdown_strict/unnamed-chunk-7-2.png" width="100%" />
-
-### Heirloom & Cherry seedings
-
-    plant_type <- matrix(sample(c("cherry", "heirloom"), replace = TRUE, size = 49), nrow = 7)
-    percent_manure <- matrix(sample(c(0, 10, 40, 60, 90), replace = TRUE, size = 49), nrow = 7)
-    ## path index
-    idx <- cbind(c(5, 5, 5, 4, 4, 4,1:7), c(1:3, 5:7, rep(4,7)))
-    plant_type[idx] <-  "path"
-    percent_manure[idx] <- NA
-    recipes <- c("Control" = 0, "Recipe 1" = 10, "Recipe 2" = 40, "Recipe 3" = 60, "Recipe 4" = 90)
-    results <- tomgro(plant_type = plant_type, percent_manure = percent_manure, recipes = recipes, prob_die = c(0.1, 0.5))
-
-    ## plotting code for students
-    library(ggplot2)
-    ggplot(data = results, aes(x = recipe, y = fruit_dry_weight, fill = plant)) +
       geom_violin() + geom_dotplot(binaxis = "y", method = "histodot") +
       theme_bw() + xlab("Fertilizer Recipie") + ylab("Fruit Dry Weight (g/m^2)") +
-      facet_wrap(~plant)
+      facet_wrap(~plant) ## omit this bit and + on previous line if just one plant type chosen
 
-<img src="README_files/figure-markdown_strict/unnamed-chunk-9-1.png" width="100%" />
+<img src="README_files/figure-markdown_strict/unnamed-chunk-4-1.png" width="100%" />

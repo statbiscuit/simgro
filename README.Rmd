@@ -46,7 +46,7 @@ percent_manure
 ```{r}
 ## map recipe names to % values
 recipes <- c("Control" = 0, "Recipe 1" = 10, "Recipe 2" = 30, "Recipe 3" = 50, "Recipe 4" = 80)
-results <- tomgro(plant_type = plant_type, percent_manure = percent_manure, recipes = recipes, prob_die = c(0.1, 0.5))
+results <- tomgro(plant_type = plant_type, percent_manure = percent_manure, recipes = recipes, prob_die = c(0.5, 0.1))
 results
 
 
@@ -84,91 +84,14 @@ ggplot(data, aes(x = Percentage, y = value, col = Type)) +
 ## heirloom survived perc[which(func(perc, "heirloom") > 10)]
 ```
 
-## Further examples & student plotting code
-
-
-### Just 30 Cherry seedlings
-
-```{r, warning = FALSE,message = FALSE, out.width="100%"}
-## Just 30 Cherry tomato seedlings
-## setting up data
-plant_type <- matrix(rep("cherry", 49), nrow = 7) 
-percent_manure <- matrix(sample(c(0, 10, 30, 50, 80), replace = TRUE, size = 49), nrow = 7)
-## path index
-idx <- cbind(c(5, 5, 5, 4, 4, 4,1:7), c(1:3, 5:7, rep(4,7)))
-## six missing planters
-idx_empty <- cbind(c(1:3, 5:7), c(1:3, rep(7, 3)))
-plant_type[idx] <-  "path"
-plant_type[idx_empty] <-  "empty"
-percent_manure[rbind(idx, idx_empty)] <- NA
-recipes <- c("Control" = 0, "Recipe 1" = 10, "Recipe 2" = 30, "Recipe 3" = 50, "Recipe 4" = 80)
-results <- tomgro(plant_type = plant_type, percent_manure = percent_manure, recipes = recipes, prob_die = c(0.1, 0.5))
-```
+## Student plotting code
 
 
 ```{r, warning = FALSE,message = FALSE, out.width="100%"}
-##plotting code for students
+## sample plotting code for students
 library(ggplot2)
 ggplot(data = results, aes(x = recipe, y = fruit_dry_weight)) +
-  geom_violin() + geom_dotplot(binaxis = "y", method = "histodot") +
-  theme_bw() + xlab("Fertilizer Recipie") + ylab("Fruit Dry Weight (g/m^2)")
-ggplot(data = results, aes(x = recipe, y = mature_fruit_weight)) +
-  geom_violin() + geom_dotplot(binaxis = "y", method = "histodot") +
-  theme_bw() + xlab("Fertilizer Recipie") + ylab("Mature Fruit Weight (g/m^2)")
-
-```
-
-
-### Just 30 Heirloom seedings
-
-```{r, warning = FALSE,message = FALSE, out.width="100%"}
-## Just 30 Cherry tomato seedlings
-## setting up data
-plant_type <- matrix(rep("heirloom", 49), nrow = 7) 
-percent_manure <- matrix(sample(c(0, 10, 30, 60, 80), replace = TRUE, size = 49), nrow = 7)
-## path index
-idx <- cbind(c(5, 5, 5, 4, 4, 4,1:7), c(1:3, 5:7, rep(4,7)))
-## six missing planters
-idx_empty <- cbind(c(1:3, 5:7), c(1:3, rep(7, 3)))
-plant_type[idx] <-  "path"
-plant_type[idx_empty] <-  "empty"
-percent_manure[rbind(idx, idx_empty)] <- NA
-recipes <- c("Control" = 0, "Recipe 1" = 10, "Recipe 2" = 30, "Recipe 3" = 60, "Recipe 4" = 80)
-results <- tomgro(plant_type = plant_type, percent_manure = percent_manure, recipes = recipes, prob_die = c(0.1, 0.5))
-```
-
-```{r,warning = FALSE,message = FALSE, out.width="100%"}
-## plotting code for students
-library(ggplot2)
-## one tomato type
-ggplot(data = results, aes(x = recipe, y = fruit_dry_weight)) +
-  geom_violin() + geom_dotplot(binaxis = "y", method = "histodot") +
-  theme_bw() + xlab("Fertilizer Recipie") + ylab("Fruit Dry Weight (g/m^2)")
-ggplot(data = results, aes(x = recipe, y = mature_fruit_weight)) +
-  geom_violin() + geom_dotplot(binaxis = "y", method = "histodot") +
-  theme_bw() + xlab("Fertilizer Recipie") + ylab("Mature Fruit Weight (g/m^2)")
-
-```
-
-### Heirloom & Cherry seedings
-
-
-```{r,warning = FALSE,message = FALSE, out.width="100%"}
-plant_type <- matrix(sample(c("cherry", "heirloom"), replace = TRUE, size = 49), nrow = 7)
-percent_manure <- matrix(sample(c(0, 10, 40, 60, 90), replace = TRUE, size = 49), nrow = 7)
-## path index
-idx <- cbind(c(5, 5, 5, 4, 4, 4,1:7), c(1:3, 5:7, rep(4,7)))
-plant_type[idx] <-  "path"
-percent_manure[idx] <- NA
-recipes <- c("Control" = 0, "Recipe 1" = 10, "Recipe 2" = 40, "Recipe 3" = 60, "Recipe 4" = 90)
-results <- tomgro(plant_type = plant_type, percent_manure = percent_manure, recipes = recipes, prob_die = c(0.1, 0.5))
-```
-
-```{r, warning = FALSE,message = FALSE, out.width="100%"}
-## plotting code for students
-library(ggplot2)
-ggplot(data = results, aes(x = recipe, y = fruit_dry_weight, fill = plant)) +
   geom_violin() + geom_dotplot(binaxis = "y", method = "histodot") +
   theme_bw() + xlab("Fertilizer Recipie") + ylab("Fruit Dry Weight (g/m^2)") +
-  facet_wrap(~plant)
+  facet_wrap(~plant) ## omit this bit and + on previous line if just one plant type chosen
 ```
