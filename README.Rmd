@@ -17,104 +17,155 @@ Simplified version of a tomato growth and yield model for Tomato Trials <link to
 
 ## Description
 
-The file `tomgro.r` contains the required equations to simulate tomato yield based on daily average temperatures ($^\circ$C) and photosynthetic photon flux density, PPFD (light intensity).
+The file `tomgro.r` contains the required functions to simulate tomato yield based on daily average temperatures ($^\circ$C), photosynthetic photon flux density, PPFD (light intensity), 
 
-## Tomato Trials example
+## Tomato Trials examples
+
 
 ```{r}
 source("tomgro.r")
-## set up environmental data
-require(lubridate)
-dates <- seq(lubridate::ymd_h("2024-01-01-00"), lubridate::ymd_h("2024-06-30-23"), by = "days")
-## from left to right PPFD gets stronger
-PPFD_gradient <- matrix(rep(seq(140, 200, length.out = 7), each = 7), nrow = 7)
-## from top to bottom temp gets cooler
-temp_gradient <- matrix(rep(seq(28, 21, length.out = 7), each = 7), nrow = 7, byrow = TRUE)
+## plant_type and percent_manure are user input 7x7 arrays
+## where the path indecies (5, 1), (5, 2), (5, 3), (4, 5), (4, 6), (4, 7)
+## are ignored (maybe set to "path" or NA if numeric)
+## NOTE
+## if only a single type of plant is used then there are only 30 seedlings
+## and the function will pick up on this by IDing NA percent_manure values in the array
+## example
+plant_type <- matrix(sample(c("cherry", "heirloom"), replace = TRUE, size = 49), nrow = 7)
+percent_manure <- matrix(sample(c(0, 10, 30, 50, 80), replace = TRUE, size = 49), nrow = 7)
 ## path index
 idx <- cbind(c(5, 5, 5, 4, 4, 4,1:7), c(1:3, 5:7, rep(4,7)))
-temp_gradient[idx] <- PPFD_gradient[idx] <-  NA
+plant_type[idx] <-  "path"
+plant_type
+percent_manure[idx] <- NA
+percent_manure
 ```
 
-### Baseline Greenhouse environmenlat variables
-
-```{r, echo = FALSE, warning = FALSE}
-library(reshape2)
-library(ggplot2)
-
-longData <- melt(temp_gradient)
-longData<-longData[longData$value!=0,]
-
-t <- ggplot(longData, aes(x = Var2, y = Var1)) + 
-  geom_tile(aes(fill=value), col = "black") + 
-  scale_fill_gradient(low="grey90", high="red") +
-  theme_void() + theme(legend.position = "none") + ggtitle("Temperature gradient")
-
-longData <- melt(PPFD_gradient)
-longData<-longData[longData$value!=0,]
-
-p <- ggplot(longData, aes(x = Var2, y = Var1)) + 
-  geom_tile(aes(fill=value), col = "black") + 
-  scale_fill_gradient(low="grey90", high="red") +
-  theme_void() + theme(legend.position = "none") + ggtitle("PPFD gradient")
-
-patchwork::wrap_plots(t, p)
-```
-
-
-### Simulating data based on environmental data alone
-
-Note plant and fertilizer choices TODO (just involves changing coefficients of growth equations)
+### Simulation
 
 ```{r}
-## output matricies
-outputW <- outputWf <- outputWm <- matrix(NA, nrow = 7, ncol = 7)
-for(i in 1:7){ ## rows
-    for(j in 1:7){ ## cols
-        if(!is.na(temp_gradient[i, j]) & !is.na(PPFD_gradient[i, j])){
-            temp <- rnorm(length(dates), temp_gradient[i, j], 1) +
-                (cos(lubridate::day(dates))/(length(lubridate::day(dates))/5))
-            ppfd <- rnorm(length(dates), PPFD_gradient[i, j], 20)
-            gr <- grow(T = temp, PPFD = ppfd)
-            outputW[i, j] <- gr[1]
-            outputWf[i, j] <- gr[2]
-            outputWm[i, j] <- gr[3]
-        }
-    }
-}
-## Structure 
-output <- data.frame(row = rep(1:7, times = 7),
-                     col = rep(1:7, each = 7),
-                     total_plant_weight = c(outputW),
-                     fruit_dry_weight = c(outputWf),
-                     mature_fruit_weight = c(outputWm))
-output <- subset(output, !is.na(output$total_plant_weight))
-## structure of data to download
-head(output)
+## map recipe names to % values
+recipes <- c("Control" = 0, "Recipe 1" = 10, "Recipe 2" = 30, "Recipe 3" = 50, "Recipe 4" = 80)
+results <- tomgro(plant_type = plant_type, percent_manure = percent_manure, recipes = recipes, prob_die = c(0.1, 0.5))
+results
+
+
 ```
 
-#### Illustration of output
+
+### The 'TRUE' effect of manure
 
 ```{r, echo = FALSE}
-ggplot(output, aes(y = row, x = col)) + 
-  geom_tile(aes(fill=mature_fruit_weight), col = "black") + 
-  scale_fill_gradient(low="grey90", high="red") +
-  theme_void() + theme(legend.position = "none") + ggtitle("Mature Fruit Dry Weight")
+perc <- 0:100
+func <- function(x, type = "cherry"){
+    if(type == "cherry"){
+    res = (3/5)*x - (1/175)*x^2 
+    }else{
+      if(type == "heirloom"){
+    res = 4*sqrt(x) - (1/3)*x
+      }
+    }
+  return(res)
+}
+data <- data.frame(Percentage = rep(perc, 2), value = c(func(perc), func(perc, "heirloom")), Type = rep(c("Cherry", "Heirloom"), each = length(perc)))
+require(ggplot2)
+ggplot(data, aes(x = Percentage, y = value, col = Type)) +
+  geom_line(linewidth = 3) + theme_classic() + xlab("Percentage Manure") +
+   scale_color_brewer(palette = "Set1") +
+  ylab("Effect size (%)") +
+  geom_vline(xintercept = range(perc[which(func(perc) > 15.5)]), col = "red", alpha = 0.5) +
+  geom_vline(xintercept = range(perc[which(func(perc) > 13)]), col = "red", alpha = 0.5, lty = 2)+
+  geom_vline(xintercept = range(perc[which(func(perc, "heirloom") > 11.5)]), col = "darkblue", alpha = 0.5) +
+  geom_vline(xintercept = range(perc[which(func(perc, "heirloom") > 10)]), col = "darkblue", alpha = 0.5, lty = 2) +
+  labs(subtitle = "Vertical lines indicate farm status if final answer within that range: thrived (solid) and survived (dashed), else mortgagee sale")
+## cherry thrived perc[which(func(perc) > 15.5)]
+## cherry survived perc[which(func(perc) > 13)]
+## heirloom thrived perc[which(func(perc, "heirloom") > 11.5)]
+## heirloom survived perc[which(func(perc, "heirloom") > 10)]
+```
 
+## Further examples & student plotting code
+
+
+### Just 30 Cherry seedlings
+
+```{r, eval = FALSE, warning=FALSE,message=FALSE}
+## Just 30 Cherry tomato seedlings
+## setting up data
+plant_type <- matrix(rep("cherry", 49), nrow = 7) 
+percent_manure <- matrix(sample(c(0, 10, 30, 50, 80), replace = TRUE, size = 49), nrow = 7)
+## path index
+idx <- cbind(c(5, 5, 5, 4, 4, 4,1:7), c(1:3, 5:7, rep(4,7)))
+## six missing planters
+idx_empty <- cbind(c(1:3, 5:7), c(1:3, rep(7, 3)))
+plant_type[idx] <-  "path"
+plant_type[idx_empty] <-  "empty"
+percent_manure[rbind(idx, idx_empty)] <- NA
+recipes <- c("Control" = 0, "Recipe 1" = 10, "Recipe 2" = 30, "Recipe 3" = 50, "Recipe 4" = 80)
+results <- tomgro(plant_type = plant_type, percent_manure = percent_manure, recipes = recipes, prob_die = c(0.1, 0.5))
+results
+library(ggplot2)
+## one tomato type
+ggplot(data = results, aes(x = recipe, y = fruit_dry_weight)) +
+  geom_violin() + geom_dotplot(binaxis = "y", method = "histodot") +
+  theme_bw() + xlab("Fertilizer Recipie") + ylab("Fruit Dry Weight (g/m^2)")
+ggplot(data = results, aes(x = recipe, y = mature_fruit_weight)) +
+  geom_violin() + geom_dotplot(binaxis = "y", method = "histodot") +
+  theme_bw() + xlab("Fertilizer Recipie") + ylab("Mature Fruit Weight (g/m^2)")
 
 ```
 
-## Example student plotting code
+
+### Just 30 Heirloom seedings
 
 ```{r, eval = FALSE, warning=FALSE,message=FALSE}
+## Just 30 Cherry tomato seedlings
+## setting up data
+plant_type <- matrix(rep("heirloom", 49), nrow = 7) 
+percent_manure <- matrix(sample(c(0, 10, 30, 60, 80), replace = TRUE, size = 49), nrow = 7)
+## path index
+idx <- cbind(c(5, 5, 5, 4, 4, 4,1:7), c(1:3, 5:7, rep(4,7)))
+## six missing planters
+idx_empty <- cbind(c(1:3, 5:7), c(1:3, rep(7, 3)))
+plant_type[idx] <-  "path"
+plant_type[idx_empty] <-  "empty"
+percent_manure[rbind(idx, idx_empty)] <- NA
+recipes <- c("Control" = 0, "Recipe 1" = 10, "Recipe 2" = 30, "Recipe 3" = 60, "Recipe 4" = 80)
+results <- tomgro(plant_type = plant_type, percent_manure = percent_manure, recipes = recipes, prob_die = c(0.1, 0.5))
+```
+
+```{r}
+## plotting code for students
 library(ggplot2)
 ## one tomato type
-ggplot(data = data, aes(x = treatment, y = fruit_dry_weight)) +
+ggplot(data = results, aes(x = recipe, y = fruit_dry_weight)) +
   geom_violin() + geom_dotplot(binaxis = "y", method = "histodot") +
   theme_bw() + xlab("Fertilizer Recipie") + ylab("Fruit Dry Weight (g/m^2)")
-## two tomato types
-ggplot(data = data, aes(x = treatment, y = fruit_dry_weight)) +
+ggplot(data = results, aes(x = recipe, y = mature_fruit_weight)) +
+  geom_violin() + geom_dotplot(binaxis = "y", method = "histodot") +
+  theme_bw() + xlab("Fertilizer Recipie") + ylab("Mature Fruit Weight (g/m^2)")
+
+```
+
+### Heirloom & Cherry seedings
+
+
+```{r}
+plant_type <- matrix(sample(c("cherry", "heirloom"), replace = TRUE, size = 49), nrow = 7)
+percent_manure <- matrix(sample(c(0, 10, 40, 60, 90), replace = TRUE, size = 49), nrow = 7)
+## path index
+idx <- cbind(c(5, 5, 5, 4, 4, 4,1:7), c(1:3, 5:7, rep(4,7)))
+plant_type[idx] <-  "path"
+percent_manure[idx] <- NA
+recipes <- c("Control" = 0, "Recipe 1" = 10, "Recipe 2" = 40, "Recipe 3" = 60, "Recipe 4" = 90)
+results <- tomgro(plant_type = plant_type, percent_manure = percent_manure, recipes = recipes, prob_die = c(0.1, 0.5))
+```
+
+```{r, warning = FALSE, message = FALSE}
+## plotting code for students
+library(ggplot2)
+ggplot(data = results, aes(x = recipe, y = fruit_dry_weight, fill = plant)) +
   geom_violin() + geom_dotplot(binaxis = "y", method = "histodot") +
   theme_bw() + xlab("Fertilizer Recipie") + ylab("Fruit Dry Weight (g/m^2)") +
-  facet_wrap(~species)
-
+  facet_wrap(~plant)
 ```

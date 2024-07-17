@@ -156,20 +156,11 @@ mature_fruit_accumulation <- function(n = 3, T = 15, nodes_pp = 22, kappa = 5, W
 #' fertilizer manure proportion.
 #' @param T average daily temperature
 #' @param PPFD average daily PPFD value
+#' @param manure_effect A scalar multiplier for additive effect of manure (%) on
+#' biomass growth rate of plant
 #' @param N Initial number of nodes, default 6
 #' @param LAI  Initial Leaf Area Index, default 0.006
-#' @param bgr_params A vector of parameters/coefficiens in
-#' Jones' 1999 Eq 5, default
-#' c("E" = 0.1717, "Q10" = 1.4, "rm" = 0.016, "D" = 2.593, "K" = 0.58, "m" = 0.1, "Qe" = 0.0645, "tau" = 0.063)
-#' where \code{E} is the growth efficiency (ratio of biomass to photosynthate available),
-#' \code{Q10}, and  \code{rm} are cofficients in maintinence respiration Eq,
-#' \code{D}, are  \code{K} are cofficients in Eq 16 Jones 1991,
-#' \code{m} is the leaf light transmission coefficient, and
-#' \code{tau} is the C02 use efficiency Eq 17 Jones 1991.
-grow <- function(T, PPFD, N = 6, LAI = 0.006,
-                 bgr_params =  c("E" = 0.1717, "Q10" = 1.4, "rm" = 0.016,
-                                 "D" = 2.593, "K" = 0.58, "m" = 0.1, "Qe" = 0.0645,
-                                 "tau" = 0.063)){
+grow <- function(T, PPFD, manure_effect, N = 6, LAI = 0.006){
     ## initial starting values
     Ws <- Wfs <- Wms <- numeric(length(T))
     W <- Wf <- Wm  <- 0
@@ -179,8 +170,8 @@ grow <- function(T, PPFD, N = 6, LAI = 0.006,
                                              plant_density = 3.1,
                                              n = N, nir = dndt)
         bgr <- biomass_growth_rate(T = T[j], PPFD = PPFD[j],
-                                   LAI = LAI , n = N, W = W, Wm = Wm,
-                                   params = bgr_params)
+                                   LAI = LAI , n = N, W = W, Wm = Wm)
+        bgr <- manure_effect*bgr + bgr
         dWfdt <- fruit_dry_matter_rate(T = T[j], bgr = bgr, n = N)
         dWdt <- above_biomass_accumulation(LAI = LAI, bgr = bgr,
                                            nir = dndt, fdr = dWfdt)
@@ -200,78 +191,94 @@ grow <- function(T, PPFD, N = 6, LAI = 0.006,
     n <- length(T) ## last day
     return(cbind(Ws[n], Wfs[n], Wms[n]))
 }
-#' Main function to simulate the tomato growth in a given cell index
-#' @param index A vector of length two that tracks the ith (i = 1, ..., 7 )
-#' and jth (j = 1, ..., 7) index of the cell (including the phantom paths),
-#' this is used to map to temperature and PPFD values.
-#' @param plant_type A character specifying the tomato plant type, either
-#' \code{"cherry"} or \code{"heirloom"}.
-#' @param percent_manure A numeric value [0,100] specifying the percentage of manure
-#' in the fertilizer recipie.
+#' Main function to simulate the tomato growth in the greenhouse
+#' @param plant_type  A 7x7 character array specifying the tomato plant type, either
+#' \code{"cherry"}, \code{"heirloom"}, or the "path"
+#' @param percent_manure A 7x7 numeric array [0,100] specifying the percentage of manure
+#' in the fertilizer recipie including the control (0).
+#' @param recipes A named vector that maps the numeric percent_manure values to the
+#' given recipe names for example \code{c("Control" = 0, "Recipe 1" = 10, "Recipe 2" = 30, "Recipe 3" = 50, "Recipe 4" = 80)}.
 #' @param n_days the number of days to "grow" the tomatoes (default 90, ~3 months)
-tomgro <- function(index, plant_type, percent_manure, n_days = 90){
-    ## stop functions
-    if(!(plant_type %in% c("cherry", "heirloom"))) stop("plant_type must be one of 'cherry or 'heirloom'")
-    if(percent_manure < 0 | percent_manure > 100 ) stop("percent_manure must be in [0,100]")
-    if(index[1] < 1 | index[1] > 7 | index[2] < 1 | index[2] > 7 ) stop("array must be a 7 x 7 grid")
+#' @param prob_die A vector of length two specifying the probabilities that eithe
+#' one or two plants die respectively. The probability that all plants survive is
+#' the complement of the sum. The default that there is a 10% chance of one plant dying and a 5% chance
+#' of two plants dying.
+tomgro <- function(plant_type, percent_manure, recipes, n_days = 90, prob_die = c(0.1, 0.05)){
+    days <- 1:n_days
+    ## manure effect function
+    manure <- function(x, type = "cherry"){
+        if(type == "cherry"){
+            res = (3/5)*x - (1/175)*x^2 
+        }else{
+            if(type == "heirloom"){
+                res = 4*sqrt(x) - (1/3)*x
+            }
+        }
+        return(res)
+    }
+    ## hardcoded horrible nonsense
+    ## Note these are the path indecies
+    ## (5, 1), (5, 2), (5, 3), (4, 5), (4, 6), (4, 7)
+    ## from left to right PPFD gets stronger
+    PPFD_gradient <- matrix(rep(seq(140, 200, length.out = 7), each = 7), nrow = 7)
+    ## from top to bottom temp gets cooler
+    temp_gradient <- matrix(rep(seq(28, 21, length.out = 7), each = 7), nrow = 7, byrow = TRUE)
     ## path index
     idx <- cbind(c(5, 5, 5, 4, 4, 4,1:7), c(1:3, 5:7, rep(4,7)))
-    for(k in 1:nrow(idx)){
-        if(index[1] == idx[k, 1] & index[2] == idx[k, 2]) stop("not a valid index, this is a path index")
-    }
-    ## index
-    i <- index[1] ## row index
-    j <- index[2] ## column index
-    ## hard coded horrible nonsense
-    ## NA path indecies
-    ## (5, 1), (5, 2), (5, 3), (4, 5), (4, 6), (4, 7)
-    ## baseline temperature
-    ## from top to bottom temp gets cooler
-    if(i == 1) temp <- 28
-    if(i == 2) temp <- 26.83
-    if(i == 3) temp <- 25.66
-    if(i == 4) temp <- 224.5
-    if(i == 5) temp <- 22.16
-    if(i == 6) temp <- 23.33
-    if(i == 7) temp <- 23.33
-    ## baseline PPFD
-    ## from left to right PPFD gets stronger
-    if(j == 1) ppfd <- 140
-    if(j == 2) ppfd <- 150
-    if(j == 3) ppfd <- 160
-    if(j == 4) ppfd <- 170
-    if(j == 5) ppfd <- 180
-    if(j == 6) ppfd <- 190
-    if(j == 7) ppfd <- 200
-    ## plant type changes N and LAI intial values
-    ## manure percentage changes biomas growth rate
-    ## by modifying the C02 use efficiency
-    ## which is different per plant type
-    if(plant_type == "cherry"){
-        N <- 15
-        LAI <- 0.06
-        bgr_params =  c("E" = 0.1717, "Q10" = 1.4, "rm" = 0.016,
-                                 "D" = 2.593, "K" = 0.58, "m" = 0.1, "Qe" = 0.0645,
-                                 "tau" = (percent_manure/100)*0.063)
-    }else{
-        if(plant_type == "heirloom"){
-            N <- 5
-            LAI <- 0.09
-            bgr_params =  c("E" = 0.1717, "Q10" = 1.4, "rm" = 0.016,
-                                 "D" = 2.593, "K" = 0.58, "m" = 0.1, "Qe" = 0.0645,
-                                 "tau" = (1 - (percent_manure/100))*0.063)
+    temp_gradient[idx] <- PPFD_gradient[idx] <-  NA
+    ## initiate output matricies
+    outputW <- outputWf <- outputWm <- matrix(NA, nrow = 7, ncol = 7)
+    for(i in 1:7){ ## rows
+        for(j in 1:7){ ## cols
+            if(!is.na(temp_gradient[i, j]) & !is.na(PPFD_gradient[i, j]) & !is.na(percent_manure[i, j])){
+                temp_days <- rnorm(n_days, temp_gradient[i, j], 1) +
+                    (cos(days)/(n_days/5))
+                ppfd_days <- rnorm(n_days, PPFD_gradient[i, j], 20)
+                ## plant type changes N and LAI intial values
+                ## manure percentage changes biomas growth rate
+                ## by modifying the C02 use efficiency
+                ## which is different per plant type
+                if(plant_type[i, j] == "cherry"){
+                    N <- 15
+                    LAI <- 0.06
+                    manure_effect <- manure(percent_manure[i, j])
+                }else{
+                    if(plant_type[i, j] == "heirloom"){
+                        N <- 5
+                        LAI <- 0.09
+                        manure_effect <- manure(percent_manure[i, j], "heirloom")
+                    }
+                }
+                gr <- grow(T = temp_days, PPFD = ppfd_days, manure_effect = manure_effect, N = N, LAI = LAI)
+                outputW[i, j] <- gr[1]
+                outputWf[i, j] <- gr[2]
+                outputWm[i, j] <- gr[3]
+            }
         }
     }
-    ## simulate over time period
-    days <- 1:n_days
-    temp_days <- rnorm(n_days, temp, 1) +
-                (cos(days)/(n_days/5))
-    ppfd_days <- rnorm(n_days, ppfd, 20)
-    gr <- grow(T = temp_days, PPFD = ppfd_days, N = N, LAI = LAI,  bgr_params =  bgr_params)
-    ## results
-    res <- data.frame(row = i, column = j, plant = plant_type, percent_manure = percent_manure,
-                      total_plant_weight = gr[1], fruit_dry_weight = gr[2], mature_fruit_weight = gr[3])
-    return(res)
+    ## Output dataframe 
+    output <- data.frame(row = rep(1:7, times = 7),
+                         col = rep(1:7, each = 7),
+                         plant = c(plant_type),
+                         recipe = numeric(49), ## initalise
+                         percent_manure = c(percent_manure),
+                         survived = numeric(49), ## initialise
+                         total_plant_weight = c(outputW),
+                         fruit_dry_weight = c(outputWf),
+                         mature_fruit_weight = c(outputWm))
+    output <- subset(output, !is.na(output$total_plant_weight) | !is.na(output$percent_manure))
+    ## randomly kill (a) plant(s) (this has absolutely nothing to do with the environmental factors)
+    ## maximum of two plants can die
+    ## probability of  a single plant dying is prob_die[]
+    ## probability of two plants dying is prob_die[2]
+    kill_plant <- sample(c("survived", "single_plant_died", "two_plants_died"),
+                         size = 1, prob = c((1 - sum(prob_die)), prob_die[1], prob_die[2]))
+    if(kill_plant == "single_plant_died") idx <- sample(1:36, size = 1)
+    if(kill_plant == "two_plants_died") idx <- sample(1:36, size = 2)
+    if(kill_plant != "survived") output[idx, 7:9] <- NA
+    output$survived <- ifelse(is.na(output$total_plant_weight), "no", "yes")
+    output$recipe <- names(recipes)[match(output$percent_manure, recipes)]
+    return(output)
 }
     
     
