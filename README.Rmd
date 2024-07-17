@@ -55,7 +55,7 @@ results
 
 ### The 'TRUE' effect of manure
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, warning = FALSE,message = FALSE, out.width="100%"}
 perc <- 0:100
 func <- function(x, type = "cherry"){
     if(type == "cherry"){
@@ -89,7 +89,7 @@ ggplot(data, aes(x = Percentage, y = value, col = Type)) +
 
 ### Just 30 Cherry seedlings
 
-```{r, eval = FALSE, warning=FALSE,message=FALSE}
+```{r, warning = FALSE,message = FALSE, out.width="100%"}
 ## Just 30 Cherry tomato seedlings
 ## setting up data
 plant_type <- matrix(rep("cherry", 49), nrow = 7) 
@@ -103,9 +103,12 @@ plant_type[idx_empty] <-  "empty"
 percent_manure[rbind(idx, idx_empty)] <- NA
 recipes <- c("Control" = 0, "Recipe 1" = 10, "Recipe 2" = 30, "Recipe 3" = 50, "Recipe 4" = 80)
 results <- tomgro(plant_type = plant_type, percent_manure = percent_manure, recipes = recipes, prob_die = c(0.1, 0.5))
-results
+```
+
+
+```{r, warning = FALSE,message = FALSE, out.width="100%"}
+##plotting code for students
 library(ggplot2)
-## one tomato type
 ggplot(data = results, aes(x = recipe, y = fruit_dry_weight)) +
   geom_violin() + geom_dotplot(binaxis = "y", method = "histodot") +
   theme_bw() + xlab("Fertilizer Recipie") + ylab("Fruit Dry Weight (g/m^2)")
@@ -118,7 +121,7 @@ ggplot(data = results, aes(x = recipe, y = mature_fruit_weight)) +
 
 ### Just 30 Heirloom seedings
 
-```{r, eval = FALSE, warning=FALSE,message=FALSE}
+```{r, warning = FALSE,message = FALSE, out.width="100%"}
 ## Just 30 Cherry tomato seedlings
 ## setting up data
 plant_type <- matrix(rep("heirloom", 49), nrow = 7) 
@@ -134,7 +137,7 @@ recipes <- c("Control" = 0, "Recipe 1" = 10, "Recipe 2" = 30, "Recipe 3" = 60, "
 results <- tomgro(plant_type = plant_type, percent_manure = percent_manure, recipes = recipes, prob_die = c(0.1, 0.5))
 ```
 
-```{r}
+```{r,warning = FALSE,message = FALSE, out.width="100%"}
 ## plotting code for students
 library(ggplot2)
 ## one tomato type
@@ -150,7 +153,7 @@ ggplot(data = results, aes(x = recipe, y = mature_fruit_weight)) +
 ### Heirloom & Cherry seedings
 
 
-```{r}
+```{r,warning = FALSE,message = FALSE, out.width="100%"}
 plant_type <- matrix(sample(c("cherry", "heirloom"), replace = TRUE, size = 49), nrow = 7)
 percent_manure <- matrix(sample(c(0, 10, 40, 60, 90), replace = TRUE, size = 49), nrow = 7)
 ## path index
@@ -161,7 +164,7 @@ recipes <- c("Control" = 0, "Recipe 1" = 10, "Recipe 2" = 40, "Recipe 3" = 60, "
 results <- tomgro(plant_type = plant_type, percent_manure = percent_manure, recipes = recipes, prob_die = c(0.1, 0.5))
 ```
 
-```{r, warning = FALSE, message = FALSE}
+```{r, warning = FALSE,message = FALSE, out.width="100%"}
 ## plotting code for students
 library(ggplot2)
 ggplot(data = results, aes(x = recipe, y = fruit_dry_weight, fill = plant)) +

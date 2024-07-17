@@ -39,25 +39,25 @@ photosynthetic photon flux density, PPFD (light intensity),
     plant_type
 
     ##      [,1]       [,2]       [,3]       [,4]   [,5]       [,6]       [,7]      
-    ## [1,] "cherry"   "cherry"   "cherry"   "path" "cherry"   "heirloom" "heirloom"
-    ## [2,] "cherry"   "cherry"   "cherry"   "path" "heirloom" "cherry"   "cherry"  
-    ## [3,] "heirloom" "heirloom" "heirloom" "path" "heirloom" "heirloom" "heirloom"
+    ## [1,] "heirloom" "cherry"   "cherry"   "path" "cherry"   "heirloom" "cherry"  
+    ## [2,] "heirloom" "heirloom" "cherry"   "path" "heirloom" "cherry"   "heirloom"
+    ## [3,] "heirloom" "cherry"   "cherry"   "path" "heirloom" "heirloom" "heirloom"
     ## [4,] "cherry"   "heirloom" "cherry"   "path" "path"     "path"     "path"    
-    ## [5,] "path"     "path"     "path"     "path" "heirloom" "cherry"   "cherry"  
-    ## [6,] "cherry"   "heirloom" "heirloom" "path" "cherry"   "cherry"   "cherry"  
-    ## [7,] "cherry"   "cherry"   "cherry"   "path" "cherry"   "heirloom" "heirloom"
+    ## [5,] "path"     "path"     "path"     "path" "heirloom" "heirloom" "cherry"  
+    ## [6,] "cherry"   "cherry"   "heirloom" "path" "cherry"   "heirloom" "heirloom"
+    ## [7,] "cherry"   "heirloom" "cherry"   "path" "cherry"   "heirloom" "heirloom"
 
     percent_manure[idx] <- NA
     percent_manure
 
     ##      [,1] [,2] [,3] [,4] [,5] [,6] [,7]
-    ## [1,]   80   80   30   NA   30   30   10
-    ## [2,]   30    0   10   NA   30   80    0
-    ## [3,]    0   50   10   NA    0   80   30
+    ## [1,]   30   10   10   NA   30   80   10
+    ## [2,]   10   80   10   NA    0   80   30
+    ## [3,]   50   10    0   NA   10   80   30
     ## [4,]   10   50   30   NA   NA   NA   NA
-    ## [5,]   NA   NA   NA   NA   50   10   80
-    ## [6,]   50   30   30   NA   50   80    0
-    ## [7,]    0   80    0   NA    0    0    0
+    ## [5,]   NA   NA   NA   NA   30   10   10
+    ## [6,]   80   30   10   NA   80   30   80
+    ## [7,]   80   30    0   NA   10   50   30
 
 ### Simulation
 
@@ -67,85 +67,83 @@ photosynthetic photon flux density, PPFD (light intensity),
     results
 
     ##    row col    plant   recipe percent_manure survived total_plant_weight
-    ## 1    1   1   cherry Recipe 4             80      yes           996.7536
-    ## 2    2   1   cherry Recipe 2             30      yes          1014.3090
-    ## 3    3   1 heirloom  Control              0      yes           445.6660
-    ## 4    4   1   cherry Recipe 1             10      yes           977.0782
-    ## 6    6   1   cherry Recipe 3             50      yes           963.8403
-    ## 7    7   1   cherry  Control              0      yes           535.7445
-    ## 8    1   2   cherry Recipe 4             80      yes          1038.9848
-    ## 9    2   2   cherry  Control              0      yes           561.2293
-    ## 10   3   2 heirloom Recipe 3             50      yes           957.4402
-    ## 11   4   2 heirloom Recipe 3             50      yes           949.6302
-    ## 13   6   2 heirloom Recipe 2             30      yes           901.3782
-    ## 14   7   2   cherry Recipe 4             80      yes           971.3710
-    ## 15   1   3   cherry Recipe 2             30      yes          1104.5500
-    ## 16   2   3   cherry Recipe 1             10      yes          1049.6304
-    ## 17   3   3 heirloom Recipe 1             10      yes           978.7397
-    ## 18   4   3   cherry Recipe 2             30      yes          1092.7910
-    ## 20   6   3 heirloom Recipe 2             30      yes           905.0123
-    ## 21   7   3   cherry  Control              0      yes           600.7992
-    ## 29   1   5   cherry Recipe 2             30      yes          1191.7500
-    ## 30   2   5 heirloom Recipe 2             30       no                 NA
-    ## 31   3   5 heirloom  Control              0      yes           569.7472
-    ## 33   5   5 heirloom Recipe 3             50      yes           994.7734
-    ## 34   6   5   cherry Recipe 3             50      yes          1096.7607
-    ## 35   7   5   cherry  Control              0      yes           660.6432
-    ## 36   1   6 heirloom Recipe 2             30      yes          1097.3839
-    ## 37   2   6   cherry Recipe 4             80      yes          1189.2651
-    ## 38   3   6 heirloom Recipe 4             80      yes          1046.0196
-    ## 40   5   6   cherry Recipe 1             10      yes          1023.7587
-    ## 41   6   6   cherry Recipe 4             80      yes          1076.2098
-    ## 42   7   6 heirloom  Control              0      yes           529.8547
-    ## 43   1   7 heirloom Recipe 1             10      yes          1079.1318
-    ## 44   2   7   cherry  Control              0      yes           719.5201
-    ## 45   3   7 heirloom Recipe 2             30      yes          1097.8289
-    ## 47   5   7   cherry Recipe 4             80      yes          1125.1346
-    ## 48   6   7   cherry  Control              0      yes           715.1987
-    ## 49   7   7 heirloom  Control              0      yes           543.9440
+    ## 1    1   1 heirloom Recipe 2             30      yes           849.1212
+    ## 2    2   1 heirloom Recipe 1             10      yes           845.4350
+    ## 3    3   1 heirloom Recipe 3             50      yes           894.2007
+    ## 4    4   1   cherry Recipe 1             10      yes           968.7056
+    ## 6    6   1   cherry Recipe 4             80      yes          1001.6359
+    ## 7    7   1   cherry Recipe 4             80      yes           931.8668
+    ## 8    1   2   cherry Recipe 1             10      yes           973.0764
+    ## 9    2   2 heirloom Recipe 4             80      yes           912.0706
+    ## 10   3   2   cherry Recipe 1             10       no                 NA
+    ## 11   4   2 heirloom Recipe 3             50      yes           957.3382
+    ## 13   6   2   cherry Recipe 2             30      yes          1022.5205
+    ## 14   7   2 heirloom Recipe 2             30      yes           860.1848
+    ## 15   1   3   cherry Recipe 1             10      yes           993.0728
+    ## 16   2   3   cherry Recipe 1             10      yes          1039.7724
+    ## 17   3   3   cherry  Control              0      yes           598.7451
+    ## 18   4   3   cherry Recipe 2             30      yes          1076.5858
+    ## 20   6   3 heirloom Recipe 1             10      yes           910.6792
+    ## 21   7   3   cherry  Control              0      yes           593.2357
+    ## 29   1   5   cherry Recipe 2             30      yes          1190.9471
+    ## 30   2   5 heirloom  Control              0      yes           576.5829
+    ## 31   3   5 heirloom Recipe 1             10      yes          1015.2409
+    ## 33   5   5 heirloom Recipe 2             30      yes           993.1862
+    ## 34   6   5   cherry Recipe 4             80      yes          1059.3804
+    ## 35   7   5   cherry Recipe 1             10      yes           941.9839
+    ## 36   1   6 heirloom Recipe 4             80      yes          1079.0536
+    ## 37   2   6   cherry Recipe 4             80      yes          1192.7299
+    ## 38   3   6 heirloom Recipe 4             80      yes          1047.0076
+    ## 40   5   6 heirloom Recipe 1             10      yes           978.1433
+    ## 41   6   6 heirloom Recipe 2             30       no                 NA
+    ## 42   7   6 heirloom Recipe 3             50      yes           934.3269
+    ## 43   1   7   cherry Recipe 1             10      yes          1096.1904
+    ## 44   2   7 heirloom Recipe 2             30      yes          1120.6759
+    ## 45   3   7 heirloom Recipe 2             30      yes          1094.9508
+    ## 47   5   7   cherry Recipe 1             10      yes          1039.1453
+    ## 48   6   7 heirloom Recipe 4             80      yes           963.5239
+    ## 49   7   7 heirloom Recipe 2             30      yes           948.7971
     ##    fruit_dry_weight mature_fruit_weight
-    ## 1         79.045082           49.711400
-    ## 2         89.367525           53.098677
-    ## 3         10.456143            4.197115
-    ## 4         53.889387           27.088376
-    ## 6         92.608446           44.018924
-    ## 7         11.430484            4.659323
-    ## 8         91.839767           57.972845
-    ## 9         19.311902           10.516398
-    ## 10        50.613811           21.404805
-    ## 11        50.957142           20.547479
-    ## 13        42.078082           13.784180
-    ## 14        86.514559           34.990993
-    ## 15       119.125577           77.325256
-    ## 16        69.734121           40.296137
-    ## 17        52.725950           21.659619
-    ## 18       121.351689           63.214863
-    ## 20        50.420209           14.822233
-    ## 21        12.619294            4.961214
-    ## 29       151.274408           92.271091
-    ## 30               NA                  NA
-    ## 31        13.773766            5.761197
-    ## 33        67.534920           23.309286
-    ## 34       165.015490           71.945374
-    ## 35        14.546234            5.632877
-    ## 36        89.512007           41.765137
-    ## 37       160.643761           94.063460
-    ## 38        70.169685           27.623570
-    ## 40        82.355694           38.475165
-    ## 41       145.585522           62.725547
-    ## 42         7.609507            2.048767
-    ## 43        79.145560           37.608596
-    ## 44        24.529268           13.192180
-    ## 45        96.497141           39.235187
-    ## 47       168.178009           78.505019
-    ## 48        17.468254            7.559356
-    ## 49         8.100286            2.217403
+    ## 1          46.19069           23.159258
+    ## 2          33.04024           16.816265
+    ## 3          44.33791           19.933408
+    ## 4          50.36874           26.428716
+    ## 6          79.90003           35.894522
+    ## 7          75.59620           30.993705
+    ## 8          55.96686           33.855208
+    ## 9          45.31739           21.315009
+    ## 10               NA                  NA
+    ## 11         46.22767           17.888410
+    ## 13        101.73324           46.475272
+    ## 14         37.44542            9.819733
+    ## 15         63.02665           39.762609
+    ## 16         66.11574           38.580667
+    ## 17         19.17483            9.834894
+    ## 18        117.39701           59.131289
+    ## 20         42.91232           13.101518
+    ## 21         12.48866            4.929454
+    ## 29        150.31819           90.087236
+    ## 30         15.13464            6.442484
+    ## 31         61.29451           25.466821
+    ## 33         65.05005           23.130959
+    ## 34        133.33237           57.051296
+    ## 35         70.65914           28.358498
+    ## 36         67.34472           32.235230
+    ## 37        161.45473           90.569600
+    ## 38         69.45904           27.040687
+    ## 40         60.15297           20.646578
+    ## 41               NA                  NA
+    ## 42         58.76525           15.575122
+    ## 43        102.46430           60.934165
+    ## 44         96.14450           42.824104
+    ## 45         93.72086           38.064710
+    ## 47         94.41022           45.102237
+    ## 48         64.00961           18.862558
+    ## 49         64.99651           18.389947
 
 ### The ‘TRUE’ effect of manure
 
-    ## Loading required package: ggplot2
-
-![](README_files/figure-markdown_strict/unnamed-chunk-3-1.png)
+<img src="README_files/figure-markdown_strict/unnamed-chunk-3-1.png" width="100%" />
 
 ## Further examples & student plotting code
 
@@ -164,15 +162,20 @@ photosynthetic photon flux density, PPFD (light intensity),
     percent_manure[rbind(idx, idx_empty)] <- NA
     recipes <- c("Control" = 0, "Recipe 1" = 10, "Recipe 2" = 30, "Recipe 3" = 50, "Recipe 4" = 80)
     results <- tomgro(plant_type = plant_type, percent_manure = percent_manure, recipes = recipes, prob_die = c(0.1, 0.5))
-    results
+
+    ##plotting code for students
     library(ggplot2)
-    ## one tomato type
     ggplot(data = results, aes(x = recipe, y = fruit_dry_weight)) +
       geom_violin() + geom_dotplot(binaxis = "y", method = "histodot") +
       theme_bw() + xlab("Fertilizer Recipie") + ylab("Fruit Dry Weight (g/m^2)")
+
+<img src="README_files/figure-markdown_strict/unnamed-chunk-5-1.png" width="100%" />
+
     ggplot(data = results, aes(x = recipe, y = mature_fruit_weight)) +
       geom_violin() + geom_dotplot(binaxis = "y", method = "histodot") +
       theme_bw() + xlab("Fertilizer Recipie") + ylab("Mature Fruit Weight (g/m^2)")
+
+<img src="README_files/figure-markdown_strict/unnamed-chunk-5-2.png" width="100%" />
 
 ### Just 30 Heirloom seedings
 
@@ -197,31 +200,13 @@ photosynthetic photon flux density, PPFD (light intensity),
       geom_violin() + geom_dotplot(binaxis = "y", method = "histodot") +
       theme_bw() + xlab("Fertilizer Recipie") + ylab("Fruit Dry Weight (g/m^2)")
 
-    ## Warning: Removed 1 row containing non-finite outside the scale range
-    ## (`stat_ydensity()`).
-
-    ## Bin width defaults to 1/30 of the range of the data. Pick better value with
-    ## `binwidth`.
-
-    ## Warning: Removed 1 row containing missing values or values outside the scale range
-    ## (`stat_bindot()`).
-
-![](README_files/figure-markdown_strict/unnamed-chunk-6-1.png)
+<img src="README_files/figure-markdown_strict/unnamed-chunk-7-1.png" width="100%" />
 
     ggplot(data = results, aes(x = recipe, y = mature_fruit_weight)) +
       geom_violin() + geom_dotplot(binaxis = "y", method = "histodot") +
       theme_bw() + xlab("Fertilizer Recipie") + ylab("Mature Fruit Weight (g/m^2)")
 
-    ## Warning: Removed 1 row containing non-finite outside the scale range
-    ## (`stat_ydensity()`).
-
-    ## Bin width defaults to 1/30 of the range of the data. Pick better value with
-    ## `binwidth`.
-
-    ## Warning: Removed 1 row containing missing values or values outside the scale range
-    ## (`stat_bindot()`).
-
-![](README_files/figure-markdown_strict/unnamed-chunk-6-2.png)
+<img src="README_files/figure-markdown_strict/unnamed-chunk-7-2.png" width="100%" />
 
 ### Heirloom & Cherry seedings
 
@@ -241,4 +226,4 @@ photosynthetic photon flux density, PPFD (light intensity),
       theme_bw() + xlab("Fertilizer Recipie") + ylab("Fruit Dry Weight (g/m^2)") +
       facet_wrap(~plant)
 
-![](README_files/figure-markdown_strict/unnamed-chunk-8-1.png)
+<img src="README_files/figure-markdown_strict/unnamed-chunk-9-1.png" width="100%" />
